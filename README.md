@@ -1,6 +1,9 @@
 # My DnD 3.5 Way!
 **by Durhock**
 
+started march 2026
+
+**V1 : its worked, but still on improvement ! **
 > A standalone local D&D 3.5 companion tool  
 > Un compagnon de table local pour D&D 3.5
 
