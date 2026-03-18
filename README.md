@@ -138,8 +138,5 @@ If you want to support the project, a Ko-fi link may be added here later.
 
 Support is appreciated, but testing, feedback, and real-play usage already help a lot.
 
-License
-
 Code: MIT
 
-SRD / OGL content: Open Game License v1.0a
