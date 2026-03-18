@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My DnD 3.5 Way ! — by Durhock</title>
+<link rel="stylesheet" href="assets/css/style.css">
+
+</head>
+<body style='padding-bottom:28px;'>
+
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║           My DnD 3.5 Way !  —  by Durhock                   ║
+  ║                                                              ║
+  ║  FR:                                                         ║
+  ║  Cet outil existe pour arrêter de chercher des règles        ║
+  ║  dans 12 onglets différents.                                 ║
+  ║                                                              ║
+  ║  EN:                                                         ║
+  ║  This tool exists to stop digging through                    ║
+  ║  forums and scattered rules.                                 ║
+  ║                                                              ║
+  ║  Beer accepted.                                              ║
+  ║  Peanuts recommended.                                        ║
+  ║                                                              ║
+  ║  yes yes                                                     ║
+  ╚══════════════════════════════════════════════════════════════╝
+-->
+
+<!--
+  Durhock was here.
+
+  Skaven engineering inside.
+
+  yes yes
+-->
+
+<!--
+  Skaven language mode enabled.
+
+  If you read this code,
+  you are deep-deep in Under-Empire tunnels.
+
+  Yes yes.
+-->
+
+<!--
+  Durhock greatest rat-engineer.
+
+  Man-things will never understand-understand.
+
+  yes-yes.
+-->
+
+<!-- HEADER NAV -->
+<div id="app-header">
+  <div class="app-title" style="display:flex;flex-direction:column;line-height:1.1;gap:0;">
+    <span style="font-size:14px;font-weight:900;letter-spacing:2px;color:var(--gold);">My DnD 3.5 Way !</span>
+    <span style="font-size:9px;font-weight:400;letter-spacing:3px;color:var(--gold-dim);">by Durhock</span>
+  </div>
+  <div class="nav-tabs">
+<button class="nav-tab" onclick="showTab('sheet')" data-i18n="nav_sheet">FICHE</button>
+    <button class="nav-tab" onclick="showTab('abilities')" data-i18n="nav_abilities">CAPACITÉS</button>
+    <button class="nav-tab" onclick="showTab('magic')" id="nav-btn-magic">✨ MAGIE</button>
+    <button class="nav-tab" onclick="showTab('inventory')" id="nav-btn-inventory">🎒 INVENTAIRE</button>
+    <!-- BUFFS tab merged into FICHE -->
+    <button class="nav-tab" onclick="showTab('journal')" id="nav-btn-journal">📖 JOURNAL</button>
+    <button class="nav-tab nav-tab-build" onclick="showTab('build')" id="nav-btn-build" data-i18n="nav_build">⚒ BUILD</button>
+    <span class="nav-sep">|</span>
+        <button class="nav-tab" onclick="showTab('rules')" data-i18n="nav_wiki">📖 WIKI</button>
+    <button class="nav-tab" onclick="showTab('about')" data-i18n="nav_about">À PROPOS</button>
+  </div>
+  <div id="char-summary">
+    <span class="char-name-nav" id="nav-name">—</span>
+    <span class="char-level-nav" id="nav-level"></span>
+    <div class="hp-bar-nav"><div class="hp-fill" id="nav-hp-fill" style="width:100%"></div></div>
+    <span id="save-indicator" style="font-size:10px;color:var(--green);min-width:80px;"></span>
+    <button onclick="saveToLocalStorage()" title="Sauvegarder dans le navigateur"
+      style="padding:3px 8px;font-size:10px;font-family:'Cinzel',serif;background:rgba(80,140,80,0.2);border:1px solid var(--green);color:var(--green);border-radius:3px;cursor:pointer;letter-spacing:1px;">
+      <span data-i18n="btn_save">💾 SAVE</span>
+    </button>
+    <button onclick="exportJSON()" title="Exporter en fichier JSON"
+      style="padding:3px 8px;font-size:10px;font-family:'Cinzel',serif;background:rgba(201,147,58,0.15);border:1px solid var(--gold-dim);color:var(--gold);border-radius:3px;cursor:pointer;letter-spacing:1px;">
+      <span data-i18n="btn_export">⬇ JSON</span>
+    </button>
+    <button onclick="importJSON()" title="Importer depuis un fichier JSON"
+      style="padding:3px 8px;font-size:10px;font-family:'Cinzel',serif;background:rgba(100,100,180,0.15);border:1px solid #6688cc;color:#99aadd;border-radius:3px;cursor:pointer;letter-spacing:1px;">
+      <span data-i18n="btn_import">⬆ Charger</span>
+    </button>
+    <button onclick="resetCharacter()" title="Nouveau personnage (efface uniquement les données du personnage actif)"
+      style="padding:3px 8px;font-size:10px;font-family:'Cinzel',serif;background:rgba(180,60,60,0.15);border:1px solid var(--red);color:var(--red);border-radius:3px;cursor:pointer;letter-spacing:1px;">
+      <span data-i18n="btn_new">✕ Nouveau</span>
+    </button>
+    <!-- Language selector -->
+    <div style="position:relative;display:inline-block;">
+      <button id="lang-btn" onclick="openLangPicker()"
+        style="padding:3px 8px;font-size:10px;font-family:'Cinzel',serif;background:rgba(60,120,180,0.15);border:1px solid rgba(100,160,220,0.4);color:#88aadd;border-radius:3px;cursor:pointer;letter-spacing:1px;white-space:nowrap;"
+        title="Change language / Changer la langue">
+        <span id="lang-btn-label">🌍 Langue</span> ▾
+      </button>
+      <div id="lang-hint-line" onclick="openLangPicker()"
+        style="font-size:9px;color:#33cc55;opacity:0.7;cursor:pointer;text-align:center;margin-top:2px;letter-spacing:0.5px;font-family:'Cinzel',serif;transition:opacity 0.2s,text-shadow 0.2s;white-space:nowrap;"
+        onmouseenter="this.style.opacity='1';this.style.textShadow='0 0 8px #33ff66'"
+        onmouseleave="this.style.opacity='0.7';this.style.textShadow=''">
+        <span id="lang-hint-text" data-i18n="lang_hint">Clique ici oui-oui, teste les langues !</span>
+      </div>
+      <div id="lang-picker-dropdown"
+        style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;z-index:500;min-width:140px;box-shadow:0 4px 16px rgba(0,0,0,0.5);">
+        <div style="padding:4px 0;">
+          <button onclick="setLang('fr');openLangPicker()" class="lang-opt" data-lang="fr">🇫🇷 Français</button>
+          <button onclick="setLang('en');openLangPicker()" class="lang-opt" data-lang="en">🇬🇧 English</button>
+          <div style="height:1px;background:var(--border);margin:4px 0;"></div>
+
+          <div style="height:1px;background:var(--border);margin:4px 0;"></div>
+          <button onclick="setLang('sken');openLangPicker()" class="lang-opt" style="color:#8fbc5a;" data-lang="sken">🐀 Skaven EN</button>
+          <button onclick="setLang('skfr');openLangPicker()" class="lang-opt" style="color:#8fbc5a;" data-lang="skfr">🐀 Skaven FR</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Rich item tooltip (affiché au survol) -->
+<div id="rich-tooltip"></div>
+
+<div id="main-content">
+
+  <!-- ===================== BUILD CHARACTER ===================== -->
+  <div id="tab-journal" class="tab-content hidden">
+    <div id="journal-content" style="height:calc(100vh - 80px);"></div>
+  </div>
+
+    <div id="tab-build" class="tab-content hidden">
+    <!-- Sub-navigation -->
+    <div class="build-subnav">
+      <button class="build-tab active" onclick="showBuildPage('concept')"      id="bnt-concept">🎭 CONCEPT</button>
+      <button class="build-tab"        onclick="showBuildPage('generalinfo')"   id="bnt-generalinfo">👤 LE PJ</button>
+      <button class="build-tab"        onclick="showBuildPage('race')"          id="bnt-race">🌍 RACE</button>
+      <button class="build-tab"        onclick="showBuildPage('classlibrary')"  id="bnt-classlibrary">⚔ INFOS CLASSES</button>
+      <button class="build-tab"        onclick="showBuildPage('abilities')"     id="bnt-abilities" data-i18n="build_abilities">🎲 CARACTÉRISTIQUES</button>
+      <button class="build-tab"        onclick="showBuildPage('skills')"        id="bnt-skills" data-i18n="build_skills">📚 COMPÉTENCES</button>
+      <button class="build-tab"        onclick="showBuildPage('feats')"         id="bnt-feats" data-i18n="build_feats">✦ DONS</button>
+      <button class="build-tab"        onclick="showBuildPage('progression')"   id="bnt-progression" data-i18n="build_progression">⬆ PROGRESSION</button>
+      <button class="build-tab"        onclick="showBuildPage('summary')"       id="bnt-summary" data-i18n="build_summary">📊 RÉSUMÉ</button>
+    </div>
+    <!-- Sub-pages (rendered dynamically) -->
+    <div id="build-page-concept"      class="build-page hidden"></div>
+    <div id="build-page-generalinfo"  class="build-page hidden"></div>
+    <div id="build-page-race"         class="build-page hidden"><div id="build-race-module"></div></div>
+    <div id="build-page-classlibrary" class="build-page hidden"></div>
+    <div id="build-page-abilities"    class="build-page hidden"></div>
+    <div id="build-page-progression"  class="build-page hidden"></div>
+    <div id="build-page-feats"        class="build-page hidden"></div>
+    <div id="build-page-skills"       class="build-page hidden">
+      <!-- Skills layout cloned here so renderSkills() targets the right IDs -->
+      <div style="display:grid;grid-template-columns:220px 1fr;gap:16px;align-items:start;">
+        <div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title" data-i18n="lbl_available_points">POINTS DISPONIBLES</span></div>
+            <div class="panel-body" id="skill-points-summary"></div>
+          </div>
+        </div>
+        <div>
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title" data-i18n="lbl_skills">COMPÉTENCES</span>
+              <span class="small text-dim">● = compétence de classe</span>
+            </div>
+            <div class="panel-body" style="padding:0;">
+              <div class="scrollable" style="max-height:none;">
+                <table class="skills-table" id="skills-table">
+                  <thead>
+                    <tr>
+                      <th>COMPÉTENCE</th><th>CAR</th><th>RANGS</th>
+                      <th>MOD CAR</th><th>DIVERS</th><th>TOTAL</th><th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="skills-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="build-page-summary"     class="build-page hidden"></div>
+  </div>
+
+  <!-- ===================== FICHE PERSONNAGE ===================== -->
+  <div id="tab-sheet" class="tab-content hidden">
+    <div class="grid-aside">
+
+      <!-- COLONNE GAUCHE -->
+      <div>
+
+        <!-- IDENTITÉ + PORTRAIT -->
+        <div class="panel mb-12">
+          <div class="panel-header">
+            <span class="panel-title" data-i18n="lbl_identity">IDENTITÉ</span>
+            <button class="btn btn-secondary btn-small" onclick="showTab('build')">⚒ Éditer</button>
+          </div>
+          <div class="panel-body">
+            <div style="display:flex;gap:14px;align-items:flex-start;">
+              <!-- Portrait -->
+              <div id="sheet-portrait-wrap" style="flex-shrink:0;"></div>
+              <!-- Infos -->
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                  <span id="sheet-class-icon" style="font-size:22px;"></span>
+                  <div style="font-family:'Cinzel',serif;font-size:20px;color:var(--gold-light);font-weight:900;overflow:hidden;text-overflow:ellipsis;" id="sheet-name">—</div>
+                </div>
+                <div id="sheet-identity" style="font-size:12px;color:var(--text-dim);margin-bottom:8px;"></div>
+                <div id="sheet-classes" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:12px;">
+                  <div><span class="text-dim" data-i18n="lbl_age">Âge </span><span id="sheet-age" class="text-bright bold"></span></div>
+                  <div><span class="text-dim" data-i18n="lbl_size">Taille </span><span id="sheet-size" class="text-bright bold"></span></div>
+                  <div><span class="text-dim" data-i18n="lbl_height">Hauteur </span><span id="sheet-height" class="text-bright bold"></span></div>
+                  <div><span class="text-dim" data-i18n="lbl_weight">Poids </span><span id="sheet-weight" class="text-bright bold"></span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HP -->
+        <div class="panel mb-12">
+          <div class="panel-header">
+            <span class="panel-title" data-i18n="lbl_hitpoints">POINTS DE VIE</span>
+            <span class="small text-dim" id="hp-status-label"></span>
+          </div>
+          <div class="panel-body">
+            <div class="hp-display">
+              <div style="margin-bottom:10px;padding:8px 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.18);border-radius:5px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                  <span class="small cinzel" data-i18n="lbl_temp_hp" style="letter-spacing:1px;color:#e8e8e8;font-size:10px;">PV TEMPORAIRES</span>
+                  <span class="bold cinzel" style="color:#ffffff;font-size:16px;" id="hp-temp-val">0</span>
+                </div>
+                <div style="width:100%;height:7px;background:var(--bg4);border-radius:3px;overflow:hidden;border:1px solid rgba(255,255,255,0.2);margin-bottom:6px;">
+                  <div id="hp-temp-bar" style="height:100%;background:linear-gradient(90deg,#aaaaaa,#ffffff);border-radius:3px;transition:width 0.3s;width:0%;"></div>
+                </div>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <button class="btn btn-small" style="flex:1;background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);font-size:11px;" onclick="adjustTempHP(-1)">− Temp</button>
+                  <input type="number" id="hp-temp-adj" value="1" min="1" style="width:46px;text-align:center;font-size:12px;">
+                  <button class="btn btn-small" style="flex:1;background:rgba(255,255,255,0.18);color:#fff;border:1px solid rgba(255,255,255,0.35);font-size:11px;" onclick="adjustTempHP(1)">+ Temp</button>
+                </div>
+                <div class="small" style="color:rgba(255,255,255,0.35);font-style:italic;margin-top:3px;font-size:10px;">Absorbés avant les PV normaux · ne se cumulent pas</div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                <span class="small text-dim cinzel" style="letter-spacing:1px;" data-i18n="lbl_normal_hp">PV NORMAUX</span>
+                <div class="hp-numbers" style="margin:0;">
+                  <span class="hp-current" id="hp-current">0</span>
+                  <span class="hp-sep">/</span>
+                  <span class="hp-max" id="hp-max">0</span>
+                </div>
+              </div>
+              <div class="hp-bar"><div class="hp-fill" id="hp-bar-fill" style="width:100%"></div></div>
+              <div class="hp-edit-row mt-8">
+                <button class="btn btn-small btn-danger" onclick="adjustHP(-1)">− Dégâts</button>
+                <input type="number" id="hp-adj-val" value="1" min="1" style="width:55px">
+                <button class="btn btn-small btn-primary" onclick="adjustHP(1)">+ Soin</button>
+              </div>
+              <div id="hp-condition-row" class="mt-6 small" style="display:none;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DÉFENSES — CA prominente -->
+        <div class="panel mb-12">
+          <div class="panel-header">
+            <span class="panel-title" data-i18n="lbl_defenses">DÉFENSES</span>
+            <button class="btn btn-secondary btn-small" onclick="showBreakdown('ac')">Détail</button>
+          </div>
+          <div class="panel-body">
+            <!-- AC principale — grande et visible -->
+            <div style="display:flex;align-items:center;gap:16px;padding:12px 14px;background:var(--bg3);border:1px solid var(--gold-dim);border-radius:6px;margin-bottom:10px;">
+              <div style="font-size:32px;line-height:1;">🛡</div>
+              <div style="flex:1;">
+                <div class="cinzel" style="font-size:10px;letter-spacing:2px;color:var(--text-dim);margin-bottom:2px;">CLASSE D'ARMURE</div>
+                <div style="font-family:'Cinzel',serif;font-size:38px;font-weight:900;color:var(--gold-light);line-height:1;" id="sheet-ac">—</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:11px;color:var(--text-dim);margin-bottom:4px;">Contact <strong id="sheet-ac-touch" class="text-bright">—</strong></div>
+                <div style="font-size:11px;color:var(--text-dim);">Pris au dépourvu <strong id="sheet-ac-ff" class="text-bright">—</strong></div>
+              </div>
+            </div>
+            <!-- AC breakdown chips -->
+            <div class="ac-components" id="ac-components-inline" style="margin-bottom:10px;"></div>
+            <!-- Modificateurs temporaires CA -->
+            <div style="border-top:1px solid var(--border);padding-top:10px;">
+              <div class="cinzel small text-dim mb-6" style="font-size:10px;letter-spacing:1px;">MODIFICATEURS TEMPORAIRES CA</div>
+              <div id="ac-temp-mods-wrap"></div>
+            </div>
+            <!-- Saves -->
+            <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:6px;">
+              <div class="cinzel small text-dim mb-6" style="font-size:10px;letter-spacing:1px;">JETS DE SAUVEGARDE</div>
+              <div id="save-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;"></div>
+              <!-- Temp save mods -->
+              <div id="save-temp-mods-wrap"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DÉPLACEMENT -->
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title" data-i18n="lbl_movement">DÉPLACEMENT</span></div>
+          <div class="panel-body" id="movement-panel" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;"></div>
+        </div>
+      </div>
+
+      <!-- COLONNE DROITE -->
+      <div>
+        <!-- CARACTÉRISTIQUES -->
+        <div class="panel mb-12">
+          <div class="panel-header">
+            <span class="panel-title" data-i18n="lbl_abilities">CARACTÉRISTIQUES</span>
+            <span class="small text-dim" data-i18n="lbl_click_detail">Cliquez pour détail · ±temp</span>
+          </div>
+          <div class="panel-body">
+            <div class="grid-3 gap-8" id="ability-cards-container"></div>
+          </div>
+        </div>
+
+        <!-- COMBAT -->
+        <div class="panel mb-12">
+          <div class="panel-header"><span class="panel-title" data-i18n="lbl_combat">COMBAT</span></div>
+          <div class="panel-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+              <div class="stat-box" onclick="showBreakdown('initiative')">
+                <div><div class="stat-label">INIT</div></div>
+                <div class="stat-value" id="sheet-init">+0</div>
+              </div>
+              <div class="stat-box" onclick="showBreakdown('bab')">
+                <div><div class="stat-label">BBA</div></div>
+                <div class="stat-value" id="sheet-bab">+0</div>
+              </div>
+              <div class="stat-box" onclick="showBreakdown('grapple')">
+                <div><div class="stat-label">LUTTE</div></div>
+                <div class="stat-value" id="sheet-grapple">+0</div>
+              </div>
+            </div>
+            <table class="attack-table">
+              <thead><tr><th data-i18n="th_weapon">ARME</th><th data-i18n="th_attack">ATTAQUE</th><th data-i18n="th_damage">DÉGÂTS</th><th data-i18n="th_crit">CRITIQUE</th><th data-i18n="th_type">TYPE</th></tr></thead>
+              <tbody id="attack-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- RÉSUMÉ COMBAT (profils d'arme configurés dans l'onglet Combat) -->
+        <div class="panel mb-12">
+          <div class="panel-header">
+            <span class="panel-title">⚔ COMBAT (profils)</span>
+            <button class="btn btn-secondary btn-small" style="font-size:10px;display:none;">Configurer</button>
+          </div>
+          <div class="panel-body" id="sheet-combat-summary" style="padding:8px 12px;">
+            <span class="text-dim small">Configurez vos armes dans l'onglet Combat.</span>
+          </div>
+        </div>
+
+        <!-- BUFFS RAPIDES -->
+        <div id="sheet-buff-quickbar-panel" class="panel mb-12" style="display:none;">
+          <div class="panel-header">
+            <span class="panel-title">⚡ BUFFS ACTIFS</span>
+            <button class="btn btn-secondary btn-small"
+              style="display:none;">
+              ⚔ Combat</button>
+          </div>
+          <div class="panel-body">
+            <div id="sheet-buff-quickbar" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+          </div>
+        </div>
+
+        <!-- DÉFENSES DÉCLARATIVES (DR / Immunités / Résistances) -->
+        <div id="sheet-declarative-defenses" class="panel mb-12" style="padding:10px 14px;"></div>
+
+        <!-- BUFFS LANÇABLES — raccourci fiche PJ -->
+        <div id="sheet-buff-shortcuts-panel" class="panel mb-12" style="display:none;">
+          <div class="panel-header">
+            <span class="panel-title">⚡ BUFFS LANÇABLES</span>
+            <button class="btn btn-secondary btn-small" onclick="showTab('magic')"
+              style="font-size:10px;">→ MAGIE</button>
+          </div>
+          <div class="panel-body" id="sheet-buff-shortcuts" style="padding:8px 12px;"></div>
+        </div>
+        <div class="panel mb-12">
+          <div class="panel-header">
+            <span class="panel-title" data-i18n="lbl_skills">COMPÉTENCES</span>
+            <input type="text" id="sheet-skill-filter" placeholder="🔍 Filtrer…"
+              style="width:120px;font-size:11px;padding:2px 6px;"
+              oninput="renderSheetSkills(this.value)">
+          </div>
+          <div class="panel-body" style="padding:0;">
+            <div id="sheet-skills-list" style="max-height:320px;overflow-y:auto;"></div>
+          </div>
+        </div>
+
+        <!-- EFFETS ACTIFS -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title" data-i18n="lbl_active_effects">EFFETS ACTIFS</span>
+            <button class="btn btn-secondary btn-small" style="display:none;">Gérer</button>
+          </div>
+          <div class="panel-body" id="active-buffs-summary">
+            <span class="text-dim small" data-i18n="lbl_no_buffs">Aucun buff actif</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== COMBAT ===================== -->
+  
+  <!-- ===================== CRÉATION ===================== -->
+  
+  <!-- ===================== LEVEL UP (legacy tab — redirige vers BUILD › CLASSES) ===================== -->
+  
+  <!-- ===================== INVENTAIRE ===================== -->
+  
+  <!-- ===================== SORTS (BIBLIOTHÈQUE) ===================== -->
+  <!-- ===================== PRÉPARATION DES SORTS ===================== -->
+  
+  
+  <!-- ===================== GRIMOIRE ===================== -->
+  
+  <!-- ===================== CAPACITÉS DE CLASSE ===================== -->
+  <div id="tab-abilities" class="tab-content hidden">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; gap:16px; flex-wrap:wrap;">
+      <div>
+        <h2 class="cinzel" style="color:var(--gold); font-size:16px; letter-spacing:2px; margin-bottom:4px;">CAPACITÉS DE CLASSE</h2>
+        <div class="small text-dim">Capacités actives, passives et à charge. Non-lanceurs de sorts inclus (Rage, Forme sauvage, etc.).</div>
+      </div>
+      <button class="btn btn-secondary btn-small" onclick="longRest()">☀️ Repos long (réinitialise les charges)</button>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
+      <select id="ability-filter-type" onchange="renderAbilities()" style="width:160px;">
+        <option value="">Tous types</option>
+        <option value="active_toggle">Actif — Basculer</option>
+        <option value="active_limited">Actif — Limité/jour</option>
+        <option value="passive">Passif</option>
+      </select>
+      <select id="ability-filter-cat" onchange="renderAbilities()" style="width:160px;">
+        <option value="">Toutes catégories</option>
+        <option value="combat">Combat</option>
+        <option value="defense">Défense</option>
+        <option value="divine">Divin</option>
+        <option value="transform">Transformation</option>
+        <option value="exploration">Exploration</option>
+        <option value="social">Social</option>
+        <option value="special">Spécial</option>
+      </select>
+    </div>
+    <div id="abilities-container"></div>
+    <div class="panel mt-16">
+      <div class="panel-header">
+        <span class="panel-title" data-i18n="lbl_custom_abilities">➕ CAPACITÉS PERSONNALISÉES</span>
+        <button class="btn btn-primary btn-small" onclick="openCustomAbilityModal()">+ Ajouter</button>
+      </div>
+      <div class="panel-body" id="custom-abilities-list">
+        <div class="small text-dim">Ajoutez des dons actifs, pouvoirs raciaux, objets à charge, ou toute capacité non listée.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== INVENTAIRE ===================== -->
+  <div id="tab-inventory" class="tab-content hidden">
+    <!-- Sous-navigation -->
+    <div style="display:flex;gap:4px;margin-bottom:14px;background:var(--bg3);
+         border:1px solid var(--border);border-radius:8px;padding:4px;flex-wrap:wrap;">
+      <button id="invtab-shop"      class="btn btn-secondary btn-small" onclick="showInvPage('shop')"
+        style="font-family:Cinzel,serif;font-size:11px;letter-spacing:1px;">🏪 BOUTIQUE</button>
+      <button id="invtab-inventory" class="btn btn-secondary btn-small active" onclick="showInvPage('inventory')"
+        style="font-family:Cinzel,serif;font-size:11px;letter-spacing:1px;">🎒 INVENTAIRE</button>
+      <button id="invtab-equipment" class="btn btn-secondary btn-small" onclick="showInvPage('equipment')"
+        style="font-family:Cinzel,serif;font-size:11px;letter-spacing:1px;">⚔ ÉQUIPEMENT</button>
+      <button id="invtab-purse"     class="btn btn-secondary btn-small" onclick="showInvPage('purse')"
+        style="font-family:Cinzel,serif;font-size:11px;letter-spacing:1px;">💰 BOURSE</button>
+      <!-- Forge et Transfer neutralisés V1 -->
+    </div>
+    <!-- Panels -->
+    <div id="inv-page-shop"      class="hidden"></div>
+    <div id="inv-page-inventory" ></div>
+    <div id="inv-page-equipment" class="hidden"></div>
+    <div id="inv-page-purse"     class="hidden"></div>
+    <!-- Stubs neutralisés V1 -->
+    <div id="inv-page-forge"    class="hidden"></div>
+    <div id="inv-page-transfer" class="hidden"></div>
+  </div>
+
+  <!-- ===================== MAGIE ===================== -->
+  <div id="tab-magic" class="tab-content hidden">
+    <!-- Sous-navigation interne -->
+    <div id="magic-subnav" style="display:flex;gap:2px;margin-bottom:14px;background:var(--bg3);
+         border:1px solid var(--border);border-radius:8px;padding:4px;">
+      <button id="magic-tab-prepared" class="magic-subtab active"
+        onclick="showMagicTab('prepared')"
+        style="flex:1;padding:6px 10px;font-family:Cinzel,serif;font-size:11px;letter-spacing:1px;
+               background:var(--bg2);border:1px solid var(--gold);color:var(--gold);
+               border-radius:5px;cursor:pointer;">&#9889; PRÉPARÉS</button>
+      <button id="magic-tab-known" class="magic-subtab"
+        onclick="showMagicTab('known')"
+        style="flex:1;padding:6px 10px;font-family:Cinzel,serif;font-size:11px;letter-spacing:1px;
+               background:transparent;border:1px solid var(--border);color:var(--text-dim);
+               border-radius:5px;cursor:pointer;">&#128218; CONNUS</button>
+      <button id="magic-tab-lab" class="magic-subtab"
+        onclick="showMagicTab('lab')"
+        style="flex:1;padding:6px 10px;font-family:Cinzel,serif;font-size:11px;letter-spacing:1px;
+               background:transparent;border:1px solid var(--border);color:var(--text-dim);
+               border-radius:5px;cursor:pointer;">&#129514; LABO</button>
+    </div>
+    <!-- Panneau principal — rendu par renderMagic() dans magic.js -->
+    <div id="magic-panel"></div>
+  </div>
+
+  <!-- ===================== BUFFS ===================== -->
+  
+  <!-- ===================== COMPÉTENCES ===================== -->
+  <div id="tab-skills" class="tab-content hidden">
+    <div class="grid-aside">
+      <div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title" data-i18n="lbl_available_points">POINTS DISPONIBLES</span></div>
+          <div class="panel-body" id="skill-points-summary"></div>
+        </div>
+      </div>
+      <div>
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title" data-i18n="lbl_skills">COMPÉTENCES</span>
+            <span class="small text-dim">● = compétence de classe</span>
+          </div>
+          <div class="panel-body" style="padding:0;">
+            <div class="scrollable" style="max-height:600px;">
+              <table class="skills-table" id="skills-table">
+                <thead>
+                  <tr>
+                    <th>COMPÉTENCE</th>
+                    <th>CAR</th>
+                    <th>RANGS</th>
+                    <th>MOD CAR</th>
+                    <th>DIVERS</th>
+                    <th>TOTAL</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="skills-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== WIKI / RÈGLES ===================== -->
+  <div id="tab-rules" class="tab-content hidden">
+    <div id="wiki-root" style="display:flex;height:calc(100vh - 60px);overflow:hidden;">
+      <!-- Sidebar -->
+      <div id="wiki-sidebar" style="width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;padding:0;">
+        <div style="padding:12px;border-bottom:1px solid var(--border);">
+          <input type="text" id="wiki-search" placeholder="🔍 Rechercher…" data-i18n-ph="lbl_search" style="width:100%;box-sizing:border-box;"
+                 oninput="wikiSearch(this.value)">
+        </div>
+        <div id="wiki-nav" style="padding:8px 0;"></div>
+      </div>
+      <!-- Content -->
+      <div id="wiki-content" style="flex:1;overflow-y:auto;padding:20px 28px;">
+        <div id="wiki-search-results" class="hidden"></div>
+        <div id="wiki-article"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== JOURNAL ===================== -->
+  
+  <!-- ===================== À PROPOS ===================== -->
+  <div id="tab-about" class="tab-content hidden">
+    <div id="about-content"></div>
+  </div>
+
+</div>
+
+<!-- BREAKDOWN MODAL -->
+<div class="modal-overlay hidden" id="breakdown-modal">
+  <div class="modal">
+    <div class="flex-between mb-12">
+      <div class="modal-title" id="breakdown-modal-title">Décomposition</div>
+      <button class="btn btn-secondary btn-small" onclick="closeBreakdown()">✕ Fermer</button>
+    </div>
+    <div id="breakdown-modal-content"></div>
+  </div>
+</div>
+
+<!-- ADD ITEM MODAL -->
+
+<!-- ITEM SHOP MODAL -->
+
+<!-- MONEY MODAL -->
+
+
+<!-- ADD SPELL MODAL -->
+
+
+<!-- Data -->
+<script src="js/system/i18n.js"></script>
+<script src="js/data/skills_data.js"></script>
+<script src="js/data/feats_data.js"></script>
+<script src="js/data/races_data.js"></script>
+<script src="js/data/items_data.js"></script>
+<script src="js/data/classes_data.js"></script>
+<script src="js/data/buffs_data.js"></script>
+<script src="js/data/spells_data.js"></script>
+    <!-- spells_spc_data.js deferred — load on demand if needed -->
+<script src="js/data/wiki_data.js"></script>
+<!-- Core engine -->
+<script src="js/core/rules.js"></script>
+<script src="js/core/state.js"></script>
+<script src="js/core/storage.js"></script>
+<script src="js/core/ui.js"></script>
+<!-- Feature modules -->
+<script src="js/modules/sheet.js"></script>
+<script src="js/modules/levelup.js"></script>
+<script src="js/modules/skills.js"></script>
+<script src="js/modules/wiki.js"></script>
+<script src="js/modules/buffs.js"></script>
+<script src="js/modules/build.js"></script>
+<script src="js/modules/journal.js"></script>
+<script src="js/modules/abilities.js"></script>
+<script src="js/modules/inventory.js"></script>
+<script src="js/modules/magic.js"></script>
+<script src="js/modules/combat.js"></script>
+<script src="js/modules/about.js"></script>
+<!-- Entry point -->
+<script src="app.js"></script>
+
+
+<!-- ══════════ EASTER EGG OVERLAY ══════════ -->
+<div id="ee-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9000;align-items:center;justify-content:center;">
+  <div style="background:var(--bg2);border:2px solid var(--gold);border-radius:12px;padding:30px 36px;max-width:420px;text-align:center;position:relative;font-family:'Cinzel',serif;">
+    <div id="ee-title" style="font-size:22px;font-weight:700;color:var(--gold-light);margin-bottom:14px;"></div>
+    <div id="ee-body"  style="font-size:13px;color:var(--text-dim);line-height:1.8;white-space:pre-line;"></div>
+    <div style="margin-top:20px;font-size:11px;color:var(--gold-dim);font-style:italic;" id="ee-sub"></div>
+    <button onclick="document.getElementById('ee-overlay').style.display='none'"
+      style="margin-top:20px;padding:8px 24px;font-family:'Cinzel',serif;font-size:12px;background:rgba(201,147,58,0.2);border:1px solid var(--gold);color:var(--gold);border-radius:5px;cursor:pointer;letter-spacing:1px;">
+      ⚔ Compris
+    </button>
+  </div>
+</div>
+
+<!-- ══════════ DURHOCK FOOTER ══════════ -->
+<div id="durhock-footer"
+  style="position:fixed;bottom:0;left:0;right:0;height:24px;background:rgba(0,0,0,0.7);border-top:1px solid rgba(201,147,58,0.12);display:flex;align-items:center;justify-content:center;gap:18px;z-index:100;backdrop-filter:blur(6px);">
+  <span style="font-size:10px;color:var(--gold-dim);font-family:'Cinzel',serif;font-weight:700;letter-spacing:2px;">My DnD 3.5 Way !</span>
+  <span style="font-size:9px;color:var(--border);font-family:'Cinzel',serif;">·</span>
+  <span id="durhock-name"
+    style="font-size:9px;color:var(--text-dim);font-family:'Cinzel',serif;letter-spacing:2px;">
+    by Durhock
+  </span>
+  <span style="font-size:9px;color:var(--border);font-family:'Cinzel',serif;">·</span>
+  <span id="ee-build-counter" style="font-size:9px;color:var(--text-dim);font-family:'Cinzel',serif;letter-spacing:1px;cursor:default;"></span>
+  <span style="font-size:9px;color:var(--border);font-family:'Cinzel',serif;">·</span>
+  <button onclick="showTab('about')"
+    style="font-size:9px;font-family:'Cinzel',serif;letter-spacing:1px;background:transparent;border:none;color:var(--text-dim);cursor:pointer;padding:0 4px;transition:color 0.2s;"
+    onmouseenter="this.style.color='var(--gold)'" onmouseleave="this.style.color='var(--text-dim)'">
+    À PROPOS / ABOUT
+  </button>
+</div>
+
+</body>
+</html>
